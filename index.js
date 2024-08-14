@@ -17,7 +17,7 @@ function addTodo() {
     renderTodos();
     todoInput.value = "";
   } else {
-    alert("Add a todo in the list!");
+    alert("Add a todo to the list!");
   }
 }
 
@@ -35,33 +35,31 @@ function toggleComplete(index) {
   renderTodos();
 }
 
-// Function edit todo
+// Function to edit todo
 function editTodo(index) {
   const todoItem = todoList.children[index];
-
+  
   // Ensure todo text is wrapped in a span
-  const textContainer = todoItem.querySelector('span');
+  let textContainer = todoItem.querySelector('span');
   if (!textContainer) {
-    const span = document.createElement('span');
-    span.textContent = todoItem.textContent.trim();
+    textContainer = document.createElement('span');
+    textContainer.textContent = todoItem.textContent.trim();
     todoItem.textContent = '';
-    todoItem.appendChild(span);
+    todoItem.insertBefore(textContainer, todoItem.firstChild);
   }
-
-  // Access the actual span element
-  const textElement = textContainer.firstChild; // Assuming only text content within the span
 
   // Replace text content with input
   const input = document.createElement('input');
   input.type = 'text';
-  input.value = todoItem.textContent.trim();
-  todoItem.replaceChild(input, textElement);
+  input.value = textContainer.textContent.trim();
+  todoItem.replaceChild(input, textContainer);
 
   input.focus();
 
   input.addEventListener('blur', () => {
     const newText = input.value.trim();
     if (newText !== '') {
+      todos[index].text = newText;  // Update the todo text in the array
       textContainer.textContent = newText;
       todoItem.replaceChild(textContainer, input);
     } else {
@@ -77,39 +75,39 @@ function renderTodos() {
   todos.forEach((todo, index) => {
     const li = document.createElement("li");
 
-      const textContainer = document.createElement("span");
+    const textContainer = document.createElement("span");
     textContainer.textContent = todo.text;
     li.appendChild(textContainer);
 
-    li.textContent = todo.text;
     if (todo.completed) {
       li.classList.add("completed");
     }
-// creating button-container
-     const buttonContainer = document.createElement("div");
+
+    // Creating button-container
+    const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("button-container"); // Optional: Add a class for styling
     
-    // creating buttons 
+    // Creating buttons 
     const removeButton = document.createElement("button");
     removeButton.textContent = "Remove";
     removeButton.addEventListener("click", () => removeTodo(index));
+
     const completeButton = document.createElement("button");
     completeButton.textContent = "Complete";
     completeButton.addEventListener("click", () => toggleComplete(index));
+
     const editButton = document.createElement("button");
     editButton.textContent = "Edit";
     editButton.addEventListener("click", () => {
-  console.log('Edit button clicked');
-      editTodo(index)
-    }
-      );
+      console.log('Edit button clicked');
+      editTodo(index);
+    });
 
     buttonContainer.appendChild(removeButton);
     buttonContainer.appendChild(completeButton);
     buttonContainer.appendChild(editButton);
   
- li.appendChild(buttonContainer);
-
+    li.appendChild(buttonContainer);
     todoList.appendChild(li);
   });
 }
